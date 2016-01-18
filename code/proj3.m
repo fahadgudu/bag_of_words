@@ -19,9 +19,9 @@
 FEATURE = 'bag of sift';
 % FEATURE = 'placeholder';
 
-% CLASSIFIER = 'nearest neighbor';
+CLASSIFIER = 'nearest neighbor';
 % CLASSIFIER = 'support vector machine';
-CLASSIFIER = 'placeholder';
+% CLASSIFIER = 'placeholder';
 
 % set up paths to VLFeat functions. 
 % See http://www.vlfeat.org/matlab/matlab.html for VLFeat Matlab documentation
@@ -82,8 +82,10 @@ switch lower(FEATURE)
         end
         
         % YOU CODE get_bags_of_sifts.m
-        train_image_feats = get_bags_of_sifts(train_image_paths);
-        test_image_feats  = get_bags_of_sifts(test_image_paths);
+%         train_image_feats = get_bags_of_sifts(train_image_paths);
+%         save('vocab_train.mat', 'train_image_feats');
+%         test_image_feats  = get_bags_of_sifts(test_image_paths);
+%         save('vocab_test.mat', 'test_image_feats');
         
     case 'placeholder'
         train_image_feats = [];
@@ -110,7 +112,9 @@ fprintf('Using %s classifier to predict test set categories\n', CLASSIFIER)
 
 switch lower(CLASSIFIER)    
     case 'nearest neighbor'
-        % YOU CODE nearest_neighbor_classify.m 
+        % YOU CODE nearest_neighbor_classify.m
+        load('vocab_test');
+        load('vocab_train');
         predicted_categories = nearest_neighbor_classify(train_image_feats, train_labels, test_image_feats);
         
     case 'support vector machine'

@@ -1,10 +1,5 @@
-% Starter code prepared by James Hays for CS 143, Brown University
-
-%This function will sample SIFT descriptors from the training images,
-%cluster them with kmeans, and then return the cluster centers.
-
 function vocab = build_vocabulary( image_paths, vocab_size )
-feature_array = []
+feature_array = [];
 for image = 1:+1:length(image_paths)
     I=imread(image_paths{image});
     binSize = 20 ;
