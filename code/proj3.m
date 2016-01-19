@@ -80,13 +80,16 @@ switch lower(FEATURE)
             vocab = build_vocabulary(train_image_paths, vocab_size);
             save('vocab.mat', 'vocab')
         end
-        
-        % YOU CODE get_bags_of_sifts.m
-%         train_image_feats = get_bags_of_sifts(train_image_paths);
-%         save('vocab_train.mat', 'train_image_feats');
-%         test_image_feats  = get_bags_of_sifts(test_image_paths);
-%         save('vocab_test.mat', 'test_image_feats');
-        
+        if ~exist('vocab_train.mat', 'file')
+            % YOU CODE get_bags_of_sifts.m
+            train_image_feats = get_bags_of_sifts(train_image_paths);
+            save('vocab_train.mat', 'train_image_feats');
+            test_image_feats  = get_bags_of_sifts(test_image_paths);
+            save('vocab_test.mat', 'test_image_feats');
+        else
+            load('vocab_test');
+            load('vocab_train');
+        end
     case 'placeholder'
         train_image_feats = [];
         test_image_feats = [];
@@ -113,8 +116,6 @@ fprintf('Using %s classifier to predict test set categories\n', CLASSIFIER)
 switch lower(CLASSIFIER)    
     case 'nearest neighbor'
         % YOU CODE nearest_neighbor_classify.m
-        load('vocab_test');
-        load('vocab_train');
         predicted_categories = nearest_neighbor_classify(train_image_feats, train_labels, test_image_feats);
         
     case 'support vector machine'
@@ -144,6 +145,7 @@ end
 % thumbnails each time it is called. View the webpage to help interpret
 % your classifier performance. Where is it making mistakes? Are the
 % confusions reasonable?
+
 create_results_webpage( train_image_paths, ...
                         test_image_paths, ...
                         train_labels, ...
