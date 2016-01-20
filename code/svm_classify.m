@@ -45,8 +45,14 @@ Useful functions:
 %unique() is used to get the category list from the observed training
 %category list. 'categories' will not be in the same order as in proj3.m,
 %because unique() sorts them. This shouldn't really matter, though.
-categories = unique(train_labels); 
-num_categories = length(categories);
-
-
+unique_label = unique(train_labels);
+for i = 1:length(unique_label);
+    class_find = strcmp(train_labels, unique_label{i});
+    labels(~class_find) = -1;
+    labels(class_find) = 1;
+    [W,B] = vl_svmtrain(train_image_feats', labels, 0.0005);
+    svn(i,:) = W'* test_image_feats' + B; 
+end
+[~, index] = max(svn);
+predicted_categories = unique_label(index);
 

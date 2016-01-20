@@ -1,0 +1,442 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>proj3</title><meta name="generator" content="MATLAB 8.5"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2016-01-20"><meta name="DC.source" content="proj3.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">Step 0: Set up parameters, vlfeat, category list, and image paths.</a></li><li><a href="#3">Step 1: Represent each image with the appropriate feature</a></li><li><a href="#4">Step 2: Classify each test image by training and using the appropriate classifier</a></li><li><a href="#5">Step 3: Build a confusion matrix and score the recognition system</a></li></ul></div><pre class="codeinput"><span class="comment">% Starter code prepared by James Hays and Sam Birch for CS 143, Brown U.</span>
+
+<span class="comment">% All of your code will be in "Step 1" and "Step 2", although you can</span>
+<span class="comment">% modify other parameters in the starter code.</span>
+</pre><h2>Step 0: Set up parameters, vlfeat, category list, and image paths.<a name="2"></a></h2><pre class="codeinput"><span class="comment">%For this project, you will need to report performance for three</span>
+<span class="comment">%combinations of features / classifiers. It is suggested you code them in</span>
+<span class="comment">%this order, as well:</span>
+<span class="comment">% 1) Tiny image features and nearest neighbor classifier</span>
+<span class="comment">% 2) Bag of sift features and nearest neighbor classifier</span>
+<span class="comment">% 3) Bag of sift features and linear SVM classifier</span>
+<span class="comment">%The starter code is initialized to 'placeholder' just so that the starter</span>
+<span class="comment">%code does not crash when run unmodified and you can get a preview of how</span>
+<span class="comment">%results are presented.</span>
+
+<span class="comment">% FEATURE = 'tiny image';</span>
+FEATURE = <span class="string">'bag of sift'</span>;
+<span class="comment">% FEATURE = 'placeholder';</span>
+
+<span class="comment">% CLASSIFIER = 'nearest neighbor';</span>
+CLASSIFIER = <span class="string">'support vector machine'</span>;
+<span class="comment">% CLASSIFIER = 'placeholder';</span>
+
+<span class="comment">% set up paths to VLFeat functions.</span>
+<span class="comment">% See http://www.vlfeat.org/matlab/matlab.html for VLFeat Matlab documentation</span>
+<span class="comment">% This should work on 32 and 64 bit versions of Windows, MacOS, and Linux</span>
+run(<span class="string">'~/src/vlfeat-0.9.20/toolbox/vl_setup.m'</span>)
+
+data_path = <span class="string">'data/'</span>; <span class="comment">%change if you want to work with a network copy</span>
+
+<span class="comment">%This is the list of categories / directories to use. The categories are</span>
+<span class="comment">%somewhat sorted by similarity so that the confusion matrix looks more</span>
+<span class="comment">%structured (indoor and then urban and then rural).</span>
+categories = {<span class="string">'Kitchen'</span>, <span class="string">'Store'</span>, <span class="string">'Bedroom'</span>, <span class="string">'LivingRoom'</span>, <span class="string">'Office'</span>, <span class="keyword">...</span>
+       <span class="string">'Industrial'</span>, <span class="string">'Suburb'</span>, <span class="string">'InsideCity'</span>, <span class="string">'TallBuilding'</span>, <span class="string">'Street'</span>, <span class="keyword">...</span>
+       <span class="string">'Highway'</span>, <span class="string">'OpenCountry'</span>, <span class="string">'Coast'</span>, <span class="string">'Mountain'</span>, <span class="string">'Forest'</span>};
+
+<span class="comment">%This list of shortened category names is used later for visualization.</span>
+abbr_categories = {<span class="string">'Kit'</span>, <span class="string">'Sto'</span>, <span class="string">'Bed'</span>, <span class="string">'Liv'</span>, <span class="string">'Off'</span>, <span class="string">'Ind'</span>, <span class="string">'Sub'</span>, <span class="keyword">...</span>
+    <span class="string">'Cty'</span>, <span class="string">'Bld'</span>, <span class="string">'St'</span>, <span class="string">'HW'</span>, <span class="string">'OC'</span>, <span class="string">'Cst'</span>, <span class="string">'Mnt'</span>, <span class="string">'For'</span>};
+
+<span class="comment">%number of training examples per category to use. Max is 100. For</span>
+<span class="comment">%simplicity, we assume this is the number of test cases per category, as</span>
+<span class="comment">%well.</span>
+num_train_per_cat = 100;
+
+<span class="comment">%This function returns cell arrays containing the file path for each train</span>
+<span class="comment">%and test image, as well as cell arrays with the label of each train and</span>
+<span class="comment">%test image. By default all four of these arrays will be 1500x1 where each</span>
+<span class="comment">%entry is a char array (or string).</span>
+fprintf(<span class="string">'Getting paths and labels for all train and test data\n'</span>)
+[train_image_paths, test_image_paths, train_labels, test_labels] = <span class="keyword">...</span>
+    get_image_paths(data_path, categories, num_train_per_cat);
+<span class="comment">%   train_image_paths  1500x1   cell</span>
+<span class="comment">%   test_image_paths   1500x1   cell</span>
+<span class="comment">%   train_labels       1500x1   cell</span>
+<span class="comment">%   test_labels        1500x1   cell</span>
+</pre><pre class="codeoutput">Getting paths and labels for all train and test data
+</pre><h2>Step 1: Represent each image with the appropriate feature<a name="3"></a></h2><p>Each function to construct features should return an N x d matrix, where N is the number of paths passed to the function and d is the dimensionality of each image representation. See the starter code for each function for more details.</p><pre class="codeinput">fprintf(<span class="string">'Using %s representation for images\n'</span>, FEATURE)
+
+<span class="keyword">switch</span> lower(FEATURE)
+    <span class="keyword">case</span> <span class="string">'tiny image'</span>
+        <span class="comment">% YOU CODE get_tiny_images.m</span>
+        train_image_feats = get_tiny_images(train_image_paths);
+        test_image_feats  = get_tiny_images(test_image_paths);
+
+    <span class="keyword">case</span> <span class="string">'bag of sift'</span>
+        <span class="comment">% YOU CODE build_vocabulary.m</span>
+        <span class="keyword">if</span> ~exist(<span class="string">'vocab.mat'</span>, <span class="string">'file'</span>)
+            fprintf(<span class="string">'No existing visual word vocabulary found. Computing one from training images\n'</span>)
+            vocab_size = 400; <span class="comment">%Larger values will work better (to a point) but be slower to compute</span>
+            vocab = build_vocabulary(train_image_paths, vocab_size);
+            save(<span class="string">'vocab.mat'</span>, <span class="string">'vocab'</span>)
+        <span class="keyword">end</span>
+        <span class="keyword">if</span> ~exist(<span class="string">'vocab_train.mat'</span>, <span class="string">'file'</span>)
+            <span class="comment">% YOU CODE get_bags_of_sifts.m</span>
+            train_image_feats = get_bags_of_sifts(train_image_paths);
+            save(<span class="string">'vocab_train.mat'</span>, <span class="string">'train_image_feats'</span>);
+            test_image_feats  = get_bags_of_sifts(test_image_paths);
+            save(<span class="string">'vocab_test.mat'</span>, <span class="string">'test_image_feats'</span>);
+        <span class="keyword">else</span>
+            load(<span class="string">'vocab_test'</span>);
+            load(<span class="string">'vocab_train'</span>);
+        <span class="keyword">end</span>
+    <span class="keyword">case</span> <span class="string">'placeholder'</span>
+        train_image_feats = [];
+        test_image_feats = [];
+
+    <span class="keyword">otherwise</span>
+        error(<span class="string">'Unknown feature type'</span>)
+<span class="keyword">end</span>
+
+<span class="comment">% If you want to avoid recomputing the features while debugging the</span>
+<span class="comment">% classifiers, you can either 'save' and 'load' the features as is done</span>
+<span class="comment">% with vocab.mat, or you can utilize Matlab's "code sections" functionality</span>
+<span class="comment">% http://www.mathworks.com/help/matlab/matlab_prog/run-sections-of-programs.html</span>
+</pre><pre class="codeoutput">Using bag of sift representation for images
+</pre><h2>Step 2: Classify each test image by training and using the appropriate classifier<a name="4"></a></h2><p>Each function to classify test features will return an N x 1 cell array, where N is the number of test cases and each entry is a string indicating the predicted category for each test image. Each entry in 'predicted_categories' must be one of the 15 strings in 'categories', 'train_labels', and 'test_labels'. See the starter code for each function for more details.</p><pre class="codeinput">fprintf(<span class="string">'Using %s classifier to predict test set categories\n'</span>, CLASSIFIER)
+
+<span class="keyword">switch</span> lower(CLASSIFIER)
+    <span class="keyword">case</span> <span class="string">'nearest neighbor'</span>
+        <span class="comment">% YOU CODE nearest_neighbor_classify.m</span>
+        predicted_categories = nearest_neighbor_classify(train_image_feats, train_labels, test_image_feats);
+
+    <span class="keyword">case</span> <span class="string">'support vector machine'</span>
+        <span class="comment">% YOU CODE svm_classify.m</span>
+        predicted_categories = svm_classify(train_image_feats, train_labels, test_image_feats);
+
+    <span class="keyword">case</span> <span class="string">'placeholder'</span>
+        <span class="comment">%The placeholder classifier simply predicts a random category for</span>
+        <span class="comment">%every test case</span>
+        random_permutation = randperm(length(test_labels));
+        predicted_categories = test_labels(random_permutation);
+
+    <span class="keyword">otherwise</span>
+        error(<span class="string">'Unknown classifier type'</span>)
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">Using support vector machine classifier to predict test set categories
+</pre><h2>Step 3: Build a confusion matrix and score the recognition system<a name="5"></a></h2><p>You do not need to code anything in this section.</p><pre class="codeinput"><span class="comment">% If we wanted to evaluate our recognition method properly we would train</span>
+<span class="comment">% and test on many random splits of the data. You are not required to do so</span>
+<span class="comment">% for this project.</span>
+
+<span class="comment">% This function will recreate results_webpage/index.html and various image</span>
+<span class="comment">% thumbnails each time it is called. View the webpage to help interpret</span>
+<span class="comment">% your classifier performance. Where is it making mistakes? Are the</span>
+<span class="comment">% confusions reasonable?</span>
+
+create_results_webpage( train_image_paths, <span class="keyword">...</span>
+                        test_image_paths, <span class="keyword">...</span>
+                        train_labels, <span class="keyword">...</span>
+                        test_labels, <span class="keyword">...</span>
+                        categories, <span class="keyword">...</span>
+                        abbr_categories, <span class="keyword">...</span>
+                        predicted_categories)
+
+<span class="comment">% Interpreting your performance with 100 training examples per category:</span>
+<span class="comment">%  accuracy  =   0 -&gt; Your code is broken (probably not the classifier's</span>
+<span class="comment">%                     fault! A classifier would have to be amazing to</span>
+<span class="comment">%                     perform this badly).</span>
+<span class="comment">%  accuracy ~= .07 -&gt; Your performance is chance. Something is broken or</span>
+<span class="comment">%                     you ran the starter code unchanged.</span>
+<span class="comment">%  accuracy ~= .20 -&gt; Rough performance with tiny images and nearest</span>
+<span class="comment">%                     neighbor classifier. Performance goes up a few</span>
+<span class="comment">%                     percentage points with K-NN instead of 1-NN.</span>
+<span class="comment">%  accuracy ~= .20 -&gt; Rough performance with tiny images and linear SVM</span>
+<span class="comment">%                     classifier. The linear classifiers will have a lot of</span>
+<span class="comment">%                     trouble trying to separate the classes and may be</span>
+<span class="comment">%                     unstable (e.g. everything classified to one category)</span>
+<span class="comment">%  accuracy ~= .50 -&gt; Rough performance with bag of SIFT and nearest</span>
+<span class="comment">%                     neighbor classifier. Can reach .60 with K-NN and</span>
+<span class="comment">%                     different distance metrics.</span>
+<span class="comment">%  accuracy ~= .60 -&gt; You've gotten things roughly correct with bag of</span>
+<span class="comment">%                     SIFT and a linear SVM classifier.</span>
+<span class="comment">%  accuracy &gt;= .70 -&gt; You've also tuned your parameters well. E.g. number</span>
+<span class="comment">%                     of clusters, SVM regularization, number of patches</span>
+<span class="comment">%                     sampled when building vocabulary, size and step for</span>
+<span class="comment">%                     dense SIFT features.</span>
+<span class="comment">%  accuracy &gt;= .80 -&gt; You've added in spatial information somehow or you've</span>
+<span class="comment">%                     added additional, complementary image features. This</span>
+<span class="comment">%                     represents state of the art in Lazebnik et al 2006.</span>
+<span class="comment">%  accuracy &gt;= .85 -&gt; You've done extremely well. This is the state of the</span>
+<span class="comment">%                     art in the 2010 SUN database paper from fusing many</span>
+<span class="comment">%                     features. Don't trust this number unless you actually</span>
+<span class="comment">%                     measure many random splits.</span>
+<span class="comment">%  accuracy &gt;= .90 -&gt; You get to teach the class next year.</span>
+<span class="comment">%  accuracy &gt;= .96 -&gt; You can beat a human at this task. This isn't a</span>
+<span class="comment">%                     realistic number. Some accuracy calculation is broken</span>
+<span class="comment">%                     or your classifier is cheating and seeing the test</span>
+<span class="comment">%                     labels.</span>
+</pre><pre class="codeoutput">Creating results_webpage/index.html, thumbnails, and confusion matrix
+Accuracy (mean of diagonal of confusion matrix) is 0.600
+
+ans =
+
+     7
+
+</pre><img vspace="5" hspace="5" src="proj3_01.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+% Starter code prepared by James Hays and Sam Birch for CS 143, Brown U.
+
+% All of your code will be in "Step 1" and "Step 2", although you can
+% modify other parameters in the starter code.
+
+%% Step 0: Set up parameters, vlfeat, category list, and image paths.
+
+%For this project, you will need to report performance for three
+%combinations of features / classifiers. It is suggested you code them in
+%this order, as well:
+% 1) Tiny image features and nearest neighbor classifier
+% 2) Bag of sift features and nearest neighbor classifier
+% 3) Bag of sift features and linear SVM classifier
+%The starter code is initialized to 'placeholder' just so that the starter
+%code does not crash when run unmodified and you can get a preview of how
+%results are presented.
+
+% FEATURE = 'tiny image';
+FEATURE = 'bag of sift';
+% FEATURE = 'placeholder';
+
+% CLASSIFIER = 'nearest neighbor';
+CLASSIFIER = 'support vector machine';
+% CLASSIFIER = 'placeholder';
+
+% set up paths to VLFeat functions. 
+% See http://www.vlfeat.org/matlab/matlab.html for VLFeat Matlab documentation
+% This should work on 32 and 64 bit versions of Windows, MacOS, and Linux
+run('~/src/vlfeat-0.9.20/toolbox/vl_setup.m')
+
+data_path = 'data/'; %change if you want to work with a network copy
+
+%This is the list of categories / directories to use. The categories are
+%somewhat sorted by similarity so that the confusion matrix looks more
+%structured (indoor and then urban and then rural).
+categories = {'Kitchen', 'Store', 'Bedroom', 'LivingRoom', 'Office', ...
+       'Industrial', 'Suburb', 'InsideCity', 'TallBuilding', 'Street', ...
+       'Highway', 'OpenCountry', 'Coast', 'Mountain', 'Forest'};
+   
+%This list of shortened category names is used later for visualization.
+abbr_categories = {'Kit', 'Sto', 'Bed', 'Liv', 'Off', 'Ind', 'Sub', ...
+    'Cty', 'Bld', 'St', 'HW', 'OC', 'Cst', 'Mnt', 'For'};
+    
+%number of training examples per category to use. Max is 100. For
+%simplicity, we assume this is the number of test cases per category, as
+%well.
+num_train_per_cat = 100; 
+
+%This function returns cell arrays containing the file path for each train
+%and test image, as well as cell arrays with the label of each train and
+%test image. By default all four of these arrays will be 1500x1 where each
+%entry is a char array (or string).
+fprintf('Getting paths and labels for all train and test data\n')
+[train_image_paths, test_image_paths, train_labels, test_labels] = ...
+    get_image_paths(data_path, categories, num_train_per_cat);
+%   train_image_paths  1500x1   cell      
+%   test_image_paths   1500x1   cell           
+%   train_labels       1500x1   cell         
+%   test_labels        1500x1   cell          
+
+%% Step 1: Represent each image with the appropriate feature
+% Each function to construct features should return an N x d matrix, where
+% N is the number of paths passed to the function and d is the 
+% dimensionality of each image representation. See the starter code for
+% each function for more details.
+
+fprintf('Using %s representation for images\n', FEATURE)
+
+switch lower(FEATURE)    
+    case 'tiny image'
+        % YOU CODE get_tiny_images.m 
+        train_image_feats = get_tiny_images(train_image_paths);
+        test_image_feats  = get_tiny_images(test_image_paths);
+        
+    case 'bag of sift'
+        % YOU CODE build_vocabulary.m
+        if ~exist('vocab.mat', 'file')
+            fprintf('No existing visual word vocabulary found. Computing one from training images\n')
+            vocab_size = 400; %Larger values will work better (to a point) but be slower to compute
+            vocab = build_vocabulary(train_image_paths, vocab_size);
+            save('vocab.mat', 'vocab')
+        end
+        if ~exist('vocab_train.mat', 'file')
+            % YOU CODE get_bags_of_sifts.m
+            train_image_feats = get_bags_of_sifts(train_image_paths);
+            save('vocab_train.mat', 'train_image_feats');
+            test_image_feats  = get_bags_of_sifts(test_image_paths);
+            save('vocab_test.mat', 'test_image_feats');
+        else
+            load('vocab_test');
+            load('vocab_train');
+        end
+    case 'placeholder'
+        train_image_feats = [];
+        test_image_feats = [];
+        
+    otherwise
+        error('Unknown feature type')
+end
+
+% If you want to avoid recomputing the features while debugging the
+% classifiers, you can either 'save' and 'load' the features as is done
+% with vocab.mat, or you can utilize Matlab's "code sections" functionality
+% http://www.mathworks.com/help/matlab/matlab_prog/run-sections-of-programs.html
+
+%% Step 2: Classify each test image by training and using the appropriate classifier
+% Each function to classify test features will return an N x 1 cell array,
+% where N is the number of test cases and each entry is a string indicating
+% the predicted category for each test image. Each entry in
+% 'predicted_categories' must be one of the 15 strings in 'categories',
+% 'train_labels', and 'test_labels'. See the starter code for each function
+% for more details.
+
+fprintf('Using %s classifier to predict test set categories\n', CLASSIFIER)
+
+switch lower(CLASSIFIER)    
+    case 'nearest neighbor'
+        % YOU CODE nearest_neighbor_classify.m
+        predicted_categories = nearest_neighbor_classify(train_image_feats, train_labels, test_image_feats);
+        
+    case 'support vector machine'
+        % YOU CODE svm_classify.m 
+        predicted_categories = svm_classify(train_image_feats, train_labels, test_image_feats);
+        
+    case 'placeholder'
+        %The placeholder classifier simply predicts a random category for
+        %every test case
+        random_permutation = randperm(length(test_labels));
+        predicted_categories = test_labels(random_permutation); 
+        
+    otherwise
+        error('Unknown classifier type')
+end
+
+
+
+%% Step 3: Build a confusion matrix and score the recognition system
+% You do not need to code anything in this section. 
+
+% If we wanted to evaluate our recognition method properly we would train
+% and test on many random splits of the data. You are not required to do so
+% for this project.
+
+% This function will recreate results_webpage/index.html and various image
+% thumbnails each time it is called. View the webpage to help interpret
+% your classifier performance. Where is it making mistakes? Are the
+% confusions reasonable?
+
+create_results_webpage( train_image_paths, ...
+                        test_image_paths, ...
+                        train_labels, ...
+                        test_labels, ...
+                        categories, ...
+                        abbr_categories, ...
+                        predicted_categories)
+
+% Interpreting your performance with 100 training examples per category:
+%  accuracy  =   0 -> Your code is broken (probably not the classifier's
+%                     fault! A classifier would have to be amazing to
+%                     perform this badly).
+%  accuracy ~= .07 -> Your performance is chance. Something is broken or
+%                     you ran the starter code unchanged.
+%  accuracy ~= .20 -> Rough performance with tiny images and nearest
+%                     neighbor classifier. Performance goes up a few
+%                     percentage points with K-NN instead of 1-NN.
+%  accuracy ~= .20 -> Rough performance with tiny images and linear SVM
+%                     classifier. The linear classifiers will have a lot of
+%                     trouble trying to separate the classes and may be
+%                     unstable (e.g. everything classified to one category)
+%  accuracy ~= .50 -> Rough performance with bag of SIFT and nearest
+%                     neighbor classifier. Can reach .60 with K-NN and
+%                     different distance metrics.
+%  accuracy ~= .60 -> You've gotten things roughly correct with bag of
+%                     SIFT and a linear SVM classifier.
+%  accuracy >= .70 -> You've also tuned your parameters well. E.g. number
+%                     of clusters, SVM regularization, number of patches
+%                     sampled when building vocabulary, size and step for
+%                     dense SIFT features.
+%  accuracy >= .80 -> You've added in spatial information somehow or you've
+%                     added additional, complementary image features. This
+%                     represents state of the art in Lazebnik et al 2006.
+%  accuracy >= .85 -> You've done extremely well. This is the state of the
+%                     art in the 2010 SUN database paper from fusing many 
+%                     features. Don't trust this number unless you actually
+%                     measure many random splits.
+%  accuracy >= .90 -> You get to teach the class next year.
+%  accuracy >= .96 -> You can beat a human at this task. This isn't a
+%                     realistic number. Some accuracy calculation is broken
+%                     or your classifier is cheating and seeing the test
+%                     labels.
+
+
+
+
+
+##### SOURCE END #####
+--></body></html>
